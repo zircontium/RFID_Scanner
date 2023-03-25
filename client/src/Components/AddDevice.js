@@ -1,39 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
+import { addReader, closePort, openPort, stopTCP } from "../api";
 
 function AddDevice() {
-  
   const [data, setData] = useState({
-    ip: " ",
-    Port: " ",
+    ip: "135.7.47.28",
+    port: "6000"
   });
 
-  let id = "";
-  const baseURL = "http://localhost:8080";
-  fetch(baseURL + "/addReader", {
-    method: "POST",
-  })
-    .then((res) => {
-      if (res.status === 201) {
-        console.log("Reader Added:" + res.body);
-        id = res.body;
-      }
-    })
-    .catch((err) => console.log(err.message));
+  const [id, setId] = useState("");
 
-  const handleClick = () => {
-    console.log("hi")
-    fetch(
-      baseURL + "/openTCP?id=" + id + "&ip=" + data.ip + "&port=" + data.Port, {
-      method: "POST",
-    })
-      .then((res) => {
-        if (res.status() === 200) {
-          console.log("Reader Added:" + res.body);
-        }
-      })
-      .catch((err) => console.log(err.message));
+  const handleOpenPort = () => {
+    openPort(id, data).then(res => {
+      console.log(res);
+    });
   };
+ 
+  const handleClosePort = () => {
+    closePort(id).then(res => {
+      console.log(res);
+    });
+  };
+ 
+  const handleStopTcp = () => {
+    stopTCP(id).then(res => {
+      console.log(res);
+    });
+  };
+
+  useEffect(() => {
+    addReader()
+      .then(res => {
+        setId(res);
+      })
+      .catch(err => console.log(err.message));
+  }, []);
 
   return (
     <div className="container mt-5">
@@ -50,49 +51,39 @@ function AddDevice() {
           </label>
           <input
             className="form-control"
-            onChange={(e) => {
-              setData({ ...data, id: e.target.data });
-            }}
-
-            placeholder="135.7.47.28"
-          ></input>
+            value={data.ip}
+            onChange={e => setData({ ...data, ip: e.target.value })}
+          />
           <label for="inputEmail4" className="mt-2">
             Enter Connecting Port:
           </label>
           <input
             className="form-control"
-            onChange={(e) => {
-              setData({ ...data, port: e.target.data });
-            }}
-            placeholder="6000"
-          ></input>
+            value={data.port}
+            onChange={e => setData({ ...data, port: e.target.value })}
+          />
           <button
             type="submit"
-            onClick={handleClick}
+            onClick={handleOpenPort}
             class="btn btn-primary mt-2 "
           >
             Open
           </button>
-          <button type="submit" className="btn btn-primary mx-2 mt-2">
+          <button type="submit" onClick={handleClosePort} className="btn btn-primary mx-2 mt-2">
             Close
           </button>
         </div>
         <label className="mt-2" for="comment">
           Electronics Product Code (EPC) :
         </label>
-        <textarea
-          className="form-control"
-          rows="10"
-          id="comment"
-          name="text"
-        ></textarea>
+        <textarea className="form-control" rows="10" id="comment" name="text" />
         <div className="d-flex justify-content-center mt-2">
           <button type="submit" class="btn btn-primary btn-lg">
             Start
           </button>
           <button
             type="submit"
-            onClick={handleClick}
+            onClick={handleStopTcp}
             className="btn btn-primary btn-lg mx-2"
           >
             Stop
