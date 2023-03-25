@@ -1,6 +1,40 @@
 import React from "react";
+import { useEffect, useState } from "react";
 
 function AddDevice() {
+  
+  const [data, setData] = useState({
+    ip: " ",
+    Port: " ",
+  });
+
+  let id = "";
+  const baseURL = "http://localhost:8080";
+  fetch(baseURL + "/addReader", {
+    method: "POST",
+  })
+    .then((res) => {
+      if (res.status === 201) {
+        console.log("Reader Added:" + res.body);
+        id = res.body;
+      }
+    })
+    .catch((err) => console.log(err.message));
+
+  const handleClick = () => {
+    console.log("hi")
+    fetch(
+      baseURL + "/openTCP?id=" + id + "&ip=" + data.ip + "&port=" + data.Port, {
+      method: "POST",
+    })
+      .then((res) => {
+        if (res.status() === 200) {
+          console.log("Reader Added:" + res.body);
+        }
+      })
+      .catch((err) => console.log(err.message));
+  };
+
   return (
     <div className="container mt-5">
       <form>
@@ -14,12 +48,29 @@ function AddDevice() {
           <label className="mt-2" for="inputEmail4">
             Enter IP
           </label>
-          <input className="form-control" placeholder="135.7.47.28"></input>
+          <input
+            className="form-control"
+            onChange={(e) => {
+              setData({ ...data, id: e.target.data });
+            }}
+
+            placeholder="135.7.47.28"
+          ></input>
           <label for="inputEmail4" className="mt-2">
             Enter Connecting Port:
           </label>
-          <input className="form-control" placeholder="6000"></input>
-          <button type="submit" class="btn btn-primary mt-2 ">
+          <input
+            className="form-control"
+            onChange={(e) => {
+              setData({ ...data, port: e.target.data });
+            }}
+            placeholder="6000"
+          ></input>
+          <button
+            type="submit"
+            onClick={handleClick}
+            class="btn btn-primary mt-2 "
+          >
             Open
           </button>
           <button type="submit" className="btn btn-primary mx-2 mt-2">
@@ -39,7 +90,11 @@ function AddDevice() {
           <button type="submit" class="btn btn-primary btn-lg">
             Start
           </button>
-          <button type="submit" className="btn btn-primary btn-lg mx-2">
+          <button
+            type="submit"
+            onClick={handleClick}
+            className="btn btn-primary btn-lg mx-2"
+          >
             Stop
           </button>
         </div>
