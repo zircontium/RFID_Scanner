@@ -15,14 +15,19 @@ function AddDevice() {
       console.log(res);
     });
   };
- 
+
   const handleClosePort = () => {
     closePort(id).then(res => {
       console.log(res);
     });
   };
- 
+
   const handleStopTcp = () => {
+    stopTCP(id).then(res => {
+      console.log(res);
+    });
+  };
+  const handleStartTcp = () => {
     stopTCP(id).then(res => {
       console.log(res);
     });
@@ -78,7 +83,7 @@ function AddDevice() {
         </label>
         <textarea className="form-control" rows="10" id="comment" name="text" />
         <div className="d-flex justify-content-center mt-2">
-          <button type="submit" class="btn btn-primary btn-lg">
+          <button type="submit" class="btn btn-primary btn-lg" onClick={handleStartTcp}>
             Start
           </button>
           <button
