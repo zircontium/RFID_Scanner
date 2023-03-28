@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { React, useEffect } from "react";
 import { useState } from "react";
 import { addReader, closePort, openPort, stopTCP } from "../api";
 
@@ -10,24 +10,28 @@ function AddDevice() {
 
   const [id, setId] = useState("");
 
-  const handleOpenPort = () => {
+  const handleOpenPort = (e) => {
+    e.preventDefault()
     openPort(id, data).then(res => {
       console.log(res);
     });
   };
 
-  const handleClosePort = () => {
+  const handleClosePort = (e) => {
+    e.preventDefault()
     closePort(id).then(res => {
       console.log(res);
     });
   };
 
-  const handleStopTcp = () => {
+  const handleStopTcp = (e) => {
+    e.preventDefault()
     stopTCP(id).then(res => {
       console.log(res);
     });
   };
-  const handleStartTcp = () => {
+  const handleStartTcp = (e) => {
+    e.preventDefault()
     stopTCP(id).then(res => {
       console.log(res);
     });
