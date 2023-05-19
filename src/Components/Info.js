@@ -1,7 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { BsFillArchiveFill, BsFillMenuButtonWideFill } from "react-icons/bs";
 import { GiShipBow } from "react-icons/gi";
-import { AllID } from "../Pages/AddDevice";
 
 function Info() {
   const [date, setDate] = useState(new Date());
@@ -14,7 +13,6 @@ function Info() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // const [ConnectedDivLen, setConnectedDivLen] = useState(AllID.length);
   const [storedID, setStoredID] = useState(
     sessionStorage.getItem("AllID") != null
       ? JSON.parse(sessionStorage.getItem("AllID"))

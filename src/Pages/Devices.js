@@ -5,7 +5,7 @@ import { stopTCP } from "../api";
 function Devices() {
   useEffect(() => {
     localStorage.setItem("connected_device", AllID.length);
-  }, [AllID]);
+  }, );
 
   const [deviceIDs, setDeviceIDs] = useState(
     sessionStorage.getItem("AllID") != null

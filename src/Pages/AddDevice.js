@@ -5,7 +5,6 @@ import { addReader, closePort, openPort, stopTCP, startTCP } from "../api";
 export let AllID = [];
 
 function AddDevice() {
-  // console.log(AllID);
 
   const [data, setData] = useState({
     ip: "135.7.47.28",
@@ -16,9 +15,6 @@ function AddDevice() {
 
   const [isChecked, setIsChecked] = useState(false);
 
-  const removeDevice = (index) => {
-    AllID.slice(index, 1);
-  };
 
   useEffect(() => {
     if (sessionStorage.getItem("AllID") === null) {
