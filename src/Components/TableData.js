@@ -2,7 +2,7 @@ import React from "react";
 
 function Table() {
   return (
-    <div className="mt-4">
+    <div className="mt-2 p-4">
       <table className="table table-striped table-hover">
         <thead>
           <tr>

@@ -1,19 +1,19 @@
 import React from "react";
-import "./Ui.css";
+import "../Components/Style.css";
 import Table from "./TableData";
 
-function Ui() {
+function Search() {
   return (
-    <div>
+    <div className="bg">
       <div className="container">
         <form>
-          <div className="mb-3 mt-4" controlId="formBasicEmail">
+          <div className="mt-4 p-4" controlId="formBasicEmail">
             <label>Search by RFID no.:</label>
             <input className="form-control"></input>
+            <button className="btn btn-primary mt-3" type="submit">
+              Search
+            </button>
           </div>
-          <button className="btn btn-primary" type="submit">
-            Search
-          </button>
         </form>
         <Table />
       </div>
@@ -21,4 +21,4 @@ function Ui() {
   );
 }
 
-export default Ui;
+export default Search;

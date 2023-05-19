@@ -4,67 +4,196 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
-In the project directory, you can run:
+For starting the Frontend, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# Getting Started with Application Structure
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The reader is a device that has one or more antennas that emit radio waves and receive signals back from the RFID tag.
 
-### `npm test`
+In this application we have a RFID Reader (Hardware) that is connected to our local network at 135.7.47.28 and has a port 6000.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+We have a basic device driver from there we can configure the device settings, change network settings and also we can read the tags. But the limitation was we can only read the tags one by one and we cant get the other details from the tag itself or store the data in DB.
 
-### `npm run build`
+so we recreated the software modified it.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Application Structure
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The application is divided into 2 parts
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Frontend
 
-### `npm run eject`
+Build using ReactJS
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+In this we have a UI where we have 1. Dashboard 2. Connect Device & add multiple device 3. Search by tag from DB 4. Connected Device List
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Dashboard - It contains Date time , Connected Devices , Vehicle IN , Vehicle OUT Count.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+![image](https://user-images.githubusercontent.com/83773953/233830401-acc3499b-2f06-44b1-9ad2-c187ac392a03.png)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+2. Connect Device - interface that allows us to add device and connect to the device. We can add multiple devices and connect to them simultaneously.
 
-## Learn More
+![image](https://user-images.githubusercontent.com/83773953/233830938-53acd3c7-7810-4778-8eb3-9791d7cec229.png)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3. Search by tag - We can search the tag from the DB and get the details.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+![image](https://user-images.githubusercontent.com/83773953/233830959-40df10b4-890d-43ae-b311-3b1ad10ac3ac.png)
 
-### Code Splitting
+4. Connected Device List - We can see the list of connected devices and we can Stop the device with id.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+![image](https://user-images.githubusercontent.com/83773953/233830993-3f1c4a27-4d9a-4a38-98a6-6bccf3dfbc1a.png)
 
-### Analyzing the Bundle Size
+## Backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Build using JAVA Spring Boot
 
-### Making a Progressive Web App
+The base SDK is JAVA core based software which we integrated with PosgreSQL DB.The software allows us to read the tags then from the id we are fetching the vehicle details from open API
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```
+"https://myfastagnation.in/MTMSPG/GetTagDetails?SearchType=TagId&SearchValue="
+```
 
-### Advanced Configuration
+We are storing 1. TAG ID 2. VRN 3. TIME STAMP 4. STATE (IN OR OUT) 5. REMARKS if any, in DB.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Table structure
 
-### Deployment
+```sql
+-- Table: public.response_table
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+-- DROP TABLE IF EXISTS public.response_table;
 
-### `npm run build` fails to minify
+CREATE TABLE IF NOT EXISTS public.response_table
+(
+tag_id character varying(100) COLLATE pg_catalog."default",
+vrn character varying(100) COLLATE pg_catalog."default",
+date_time timestamp without time zone,
+state character varying(100) COLLATE pg_catalog."default",
+remarks character varying COLLATE pg_catalog."default"
+)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.response_table
+OWNER to postgres;
+```
+## DB Function in JAVA
+```java
+package uhf18win;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class DbFunctions {
+    public Connection connect_to_db(String dbname,String user,String pass){
+        Connection conn=null;
+        try{
+            Class.forName("org.postgresql.Driver");
+            conn= DriverManager.getConnection("jdbc:postgresql://localhost:5432a/"+dbname,user,pass);
+            if(conn!=null){
+                System.out.println("Connection Established");
+            }
+            else{
+                System.out.println("Connection Failed");
+            }
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        return conn;
+    }
+
+    public void insert_row(Connection conn,String table_name,String Tag_ID, String VRN, String Date_Time){
+        Statement statement;
+        try {
+            String query=String.format("insert into %s(Tag_ID,VRN,Date_Time) values('%s','%s','%s');",table_name,Tag_ID,VRN,Date_Time);
+            statement=conn.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("Row Inserted");
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+}
+
+```
+## In Backend we have 5 API's so far to perform the operations,
+
+1. Each and every time we add device it creates a separate ID. This ID is crucial for operating respected device instance. We used multi threading where we can add multiple devices and run them simultaneously. The devices are running with its own thread and individual ID. For connection to Stopping the respected instance we need that id.
+   no need to worry we already integrated with it with the apis.
+
+2. Rest 4 apis are to trigger operations from the frontend,
+   a. Open b. Close c. Start d. Stop.
+
+### ID Generate
+
+```java
+@CrossOrigin
+    @RequestMapping(value="/addReader", method = RequestMethod.POST)
+    ResponseEntity addReader() {
+        final int instaceId = uhfService.createMainFrameInstance();
+        return new ResponseEntity(instaceId, HttpStatus.CREATED);
+    }
+
+```
+
+### Open TCP
+
+```java
+    @CrossOrigin
+    @RequestMapping(value="/openTCP", method = RequestMethod.POST)
+    ResponseEntity openTCP(@RequestParam("id") String id,
+                           @RequestParam("ip") String ip,
+                           @RequestParam("port") int port) {
+        if (uhfService.openTCP(Integer.parseInt(id), ip, port)) {
+            return new ResponseEntity(true, HttpStatus.OK);
+        } else {
+            return new ResponseEntity(false, HttpStatus.OK);
+        }
+    }
+
+```
+
+### Close TCP
+
+```java
+    @CrossOrigin
+    @RequestMapping(value="/closeTCP", method = RequestMethod.POST)
+    ResponseEntity closeTCP(@RequestParam("id") String id) {
+        if (uhfService.closeTCP(Integer.parseInt(id))) {
+            return new ResponseEntity(true, HttpStatus.OK);
+        } else {
+            return new ResponseEntity(false, HttpStatus.OK);
+        }
+    }
+
+```
+### Start Device
+
+```java
+    @CrossOrigin
+    @RequestMapping(value="/startTCP", method = RequestMethod.POST)
+    ResponseEntity startTCP(@RequestParam("id") String id) {
+        if (uhfService.startTCP(Integer.parseInt(id))) {
+            return new ResponseEntity(true, HttpStatus.OK);
+        } else {
+            return new ResponseEntity(false, HttpStatus.OK);
+        }
+    }
+```
+
+### Stop Device
+```java
+    @CrossOrigin
+    @RequestMapping(value="/stopTCP", method = RequestMethod.POST)
+    ResponseEntity stopTCP(@RequestParam("id") String id) {
+        if (uhfService.stopTCP(Integer.parseInt(id))) {
+            return new ResponseEntity(true, HttpStatus.OK);
+        } else {
+            return new ResponseEntity(false, HttpStatus.OK);
+        }
+    }
+    
+```

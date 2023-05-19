@@ -2,6 +2,12 @@
   text-align: center;
 }
 
+body{
+    height: 100vh;
+    background: linear-gradient(135deg, #71b7e6,#9b59b6);
+    overflow: hidden;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
