@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUri = "http://localhost:8080";
+const baseUri = "http://rfidscannerserverapp.azurewebsites.net";
 
 export const addReader = async () => {
     const { data } = await axios.post(`${baseUri}/addReader`);
